@@ -9,7 +9,6 @@ import os
 
 from app import settings
 from app.api.handlers import product_router, admin_router, frontend_router
-from app.db.session import get_db
 
 engine = create_async_engine(settings.REAL_DATABASE_URL, future=True, echo=True) #вырубить echo в проде
 

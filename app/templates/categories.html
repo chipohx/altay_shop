@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Сувенирный магазин - Категории{% endblock %}
+
+{% block content %}
+<section>
+    <h2>Категории товаров</h2>
+    <p>Выберите категорию для просмотра соответствующих товаров.</p>
+    
+    <div id="category-list" class="category-list">
+        <div class="loading">Загрузка категорий...</div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Any category-specific JavaScript can go here
+</script>
+{% endblock %} 

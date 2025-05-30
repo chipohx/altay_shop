@@ -1,0 +1,268 @@
+/* Admin Panel Styles */
+.admin-body {
+    background-color: #f9f9ff;
+    color: var(--text-dark);
+}
+
+.admin-header {
+    background-color: var(--dark-blue);
+    padding: 1rem 0;
+}
+
+.admin-header .logo h1 {
+    color: white;
+}
+
+.admin-nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+}
+
+.admin-nav ul li a {
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.admin-nav ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.admin-main {
+    padding: 2rem 0;
+    min-height: calc(100vh - 180px);
+}
+
+.admin-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+.admin-footer {
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+/* Dashboard */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.stat-card h3 {
+    color: var(--text-dark);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-blue);
+}
+
+/* Tables */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 2rem;
+}
+
+.admin-table th, 
+.admin-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    font-weight: 600;
+}
+
+.admin-table tr:hover {
+    background-color: var(--very-light-blue);
+}
+
+.admin-table .actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Forms */
+.admin-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Buttons */
+.btn-admin {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-blue);
+}
+
+.btn-secondary {
+    background-color: #eee;
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+    background-color: #ddd;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Headers with action buttons */
+.admin-header-with-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.admin-header-with-actions h2 {
+    margin: 0;
+    color: var(--primary-blue);
+}
+
+/* Product Images Preview */
+.image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.image-preview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* File Input Styling */
+.file-input-wrapper {
+    margin-top: 0.5rem;
+}
+
+.file-input-wrapper label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.file-input {
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+/* Categories Management */
+.category-form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.category-form input {
+    flex-grow: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .admin-header-with-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .admin-stats {
+        grid-template-columns: 1fr;
+    }
+} 

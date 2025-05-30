@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Админ-панель - Дашборд{% endblock %}
+
+{% block content %}
+<h1>Панель управления</h1>
+
+<div class="admin-stats">
+    <div class="stat-card">
+        <h3>Всего товаров</h3>
+        <div class="stat-value">{{ products|length }}</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Категории</h3>
+        <div class="stat-value" id="category-count">...</div>
+    </div>
+</div>
+
+<div class="admin-header-with-actions">
+    <h2>Последние товары</h2>
+    <a href="/admin/products" class="btn-admin btn-primary">Все товары</a>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products[:5] %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>{{ product.title }}</td>
+            <td>{{ product.price }} ₽</td>
+            <td class="actions">
+                <a href="/product/{{ product.id }}" target="_blank" class="btn-admin btn-sm btn-secondary">Просмотр</a>
+                <a href="/admin/products/{{ product.id }}/edit" class="btn-admin btn-sm btn-primary">Изменить</a>
+                <a href="/admin/products/{{ product.id }}/delete" class="btn-admin btn-sm btn-danger delete-link">Удалить</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Загрузка количества категорий
+    fetch('/api/v1/categories')
+        .then(response => response.json())
+        .then(categories => {
+            document.getElementById('category-count').textContent = categories.length;
+        })
+        .catch(error => {
+            document.getElementById('category-count').textContent = 'Ошибка';
+            console.error('Ошибка при загрузке категорий:', error);
+        });
+</script>
+{% endblock %} 

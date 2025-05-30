@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Админ-панель - Управление категориями{% endblock %}
+
+{% block content %}
+<h1>Управление категориями</h1>
+
+<form id="category-form" class="category-form" method="post" action="/admin/categories/new">
+    <input type="text" id="category-name" name="name" class="form-control" placeholder="Название новой категории" required>
+    <button type="submit" class="btn-admin btn-primary">Добавить категорию</button>
+</form>
+
+{% if categories %}
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+        <tr>
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td class="actions">
+                <a href="/admin/categories/{{ category.id }}/delete" class="btn-admin btn-sm btn-danger delete-link">Удалить</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="no-results">
+    <p>Категории не найдены</p>
+</div>
+{% endif %}
+{% endblock %} 

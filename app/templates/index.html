@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Сувенирный магазин - Главная{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h2>Уникальные сувениры и подарки</h2>
+    <p>Самые разнообразные продукты с Алтая</p>
+    <div id="search-results"></div>
+</section>
+
+<section class="featured-section">
+    <h2>Лучшие товары</h2>
+    <div id="featured-products" class="featured-products">
+        <div class="loading">Загрузка лучших товаров...</div>
+    </div>
+</section>
+
+<section class="recommendations-section">
+    <h2>Товары, которые могут вам понравиться</h2>
+    <div id="product-grid" class="product-grid">
+        <div class="loading">Загрузка товаров...</div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Any page-specific JavaScript can go here
+</script>
+{% endblock %} 

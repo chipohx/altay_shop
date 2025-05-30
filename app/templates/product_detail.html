@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Сувенирный магазин - {% if product %}{{ product.title }}{% else %}Детали товара{% endif %}{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/">Главная</a> / <span>{% if product %}{{ product.title }}{% else %}Детали товара{% endif %}</span>
+</div>
+
+{% if product %}
+<div class="product-detail">
+    <div class="product-gallery">
+        <div class="main-photo">
+            <img src="{% if product.main_photo %}{{ product.main_photo }}{% else %}/static/image/placeholder.jpg{% endif %}" alt="{{ product.title }}" id="main-product-image">
+        </div>
+    </div>
+    <div class="product-detail-info">
+        <h1>{{ product.title }}</h1>
+        <p class="product-detail-price">{{ product.price }} ₽</p>
+        <div class="product-detail-description">
+            {{ product.description }}
+        </div>
+        <a href="/" class="btn btn-secondary">Назад к товарам</a>
+        
+        <div class="additional-photos-container">
+            <h3>Все фотографии</h3>
+            <div class="slider-container">
+                <button class="slider-arrow prev-arrow" onclick="moveSlider(-1)">&#10094;</button>
+                <div class="additional-photos-slider">
+                    <div class="slider-track" id="slider-track">
+                        {% if product.main_photo %}
+                        <div class="additional-photo">
+                            <img src="{{ product.main_photo }}" alt="{{ product.title }} - Главное фото" 
+                                onclick="setMainImage('{{ product.main_photo }}')">
+                        </div>
+                        {% endif %}
+                        
+                        {% if product.additional_photos %}
+                        {% for photo in product.additional_photos %}
+                        <div class="additional-photo">
+                            <img src="{{ photo }}" alt="{{ product.title }} - Фото {{ loop.index + 1 }}" 
+                                onclick="setMainImage('{{ photo }}')">
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <button class="slider-arrow next-arrow" onclick="moveSlider(1)">&#10095;</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div id="product-detail" class="product-detail" data-product-id="{{ product_id }}">
+    <div class="loading">Загрузка информации о товаре...</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // These functions are initialized when product detail loads
+    let sliderPosition = 0;
+    
+    function setMainImage(imageSrc) {
+        document.getElementById('main-product-image').src = imageSrc;
+        
+        // Update active state of thumbnails
+        const thumbnails = document.querySelectorAll('.additional-photo img');
+        thumbnails.forEach(thumb => {
+            const thumbParent = thumb.parentElement;
+            if (thumb.src === imageSrc) {
+                thumbParent.classList.add('active');
+            } else {
+                thumbParent.classList.remove('active');
+            }
+        });
+    }
+    
+    function moveSlider(direction) {
+        const sliderTrack = document.getElementById('slider-track');
+        if (!sliderTrack) return;
+        
+        const additionalPhotos = document.querySelectorAll('.additional-photo');
+        const photoCount = additionalPhotos.length;
+        const visiblePhotos = window.innerWidth < 768 ? 2 : 3;
+        const maxPosition = Math.max(0, photoCount - visiblePhotos);
+        
+        sliderPosition += direction;
+        
+        // Limit slider position
+        if (sliderPosition < 0) sliderPosition = 0;
+        if (sliderPosition > maxPosition) sliderPosition = maxPosition;
+        
+        // Move the slider
+        sliderTrack.style.transform = `translateX(-${sliderPosition * 33.33}%)`;
+    }
+
+    // Initialize slider on page load
+    window.addEventListener('load', function() {
+        // Set active class on the main photo initially
+        const mainImageSrc = document.getElementById('main-product-image').src;
+        const thumbnails = document.querySelectorAll('.additional-photo img');
+        thumbnails.forEach(thumb => {
+            const thumbParent = thumb.parentElement;
+            if (thumb.src === mainImageSrc) {
+                thumbParent.classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock %} 

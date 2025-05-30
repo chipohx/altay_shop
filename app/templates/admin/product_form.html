@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Админ-панель - {% if product %}Редактирование товара{% else %}Добавление товара{% endif %}{% endblock %}
+
+{% block content %}
+<div class="admin-header-with-actions">
+    <h1>{% if product %}Редактирование товара{% else %}Добавление товара{% endif %}</h1>
+    <a href="/admin/products" class="btn-admin btn-secondary">Назад к списку</a>
+</div>
+
+<form id="product-form" class="admin-form" method="post" enctype="multipart/form-data" action="{% if product %}/admin/products/{{ product.id }}/edit{% else %}/admin/products/new{% endif %}">
+    <div class="form-group">
+        <label for="title">Название товара</label>
+        <input type="text" id="title" name="title" class="form-control" value="{{ product.title if product else '' }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="category_id">Категория</label>
+        <select id="category_id" name="category_id" class="form-control" required>
+            <option value="">Выберите категорию</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if product and product.category_id == category.id %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="price">Цена (₽)</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" class="form-control" value="{{ product.price if product else '' }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="description">Описание</label>
+        <textarea id="description" name="description" class="form-control" required>{{ product.description if product else '' }}</textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="main_photo">Главное фото</label>
+        {% if product and product.main_photo %}
+        <div class="image-preview">
+            <img src="{{ product.main_photo }}" alt="Главное фото">
+        </div>
+        {% endif %}
+        <div class="file-input-wrapper">
+            <input type="file" id="main_photo" name="main_photo" class="file-input" accept="image/*">
+            <p class="form-text">Выберите главное фото товара.</p>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="additional_photos">Дополнительные фотографии</label>
+        {% if product and product.additional_photos %}
+        <div class="image-preview">
+            {% for photo in product.additional_photos %}
+            <img src="{{ photo }}" alt="Фото {{ loop.index }}">
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="file-input-wrapper">
+            <input type="file" id="additional_photos" name="additional_photos" class="file-input" accept="image/*" multiple>
+            <p class="form-text">Вы можете выбрать несколько файлов. {% if product %}Загруженные ранее дополнительные фотографии будут сохранены.{% endif %}</p>
+        </div>
+        <div id="image-preview" class="image-preview"></div>
+    </div>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn-admin btn-primary">{% if product %}Сохранить изменения{% else %}Создать товар{% endif %}</button>
+        <a href="/admin/products" class="btn-admin btn-secondary">Отмена</a>
+    </div>
+</form>
+{% endblock %} 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Админ-панель{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="container">
+            <div class="logo">
+                <h1>Админ-панель</h1>
+            </div>
+            <nav class="admin-nav">
+                <ul>
+                    <li><a href="/admin">Панель управления</a></li>
+                    <li><a href="/admin/products">Товары</a></li>
+                    <li><a href="/admin/categories">Категории</a></li>
+                    <li><a href="/" target="_blank">Просмотр сайта</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <div class="admin-content">
+                {% if error %}
+                <div class="error-message">{{ error }}</div>
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="admin-footer">
+        <div class="container">
+            <p>&copy; 2023 Админ-панель сувенирного магазина</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', path='/js/admin.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 
