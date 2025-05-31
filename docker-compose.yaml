@@ -11,5 +11,28 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql@17/data
 
+  auth_db:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql@17/data
+
+#   auth:
+#     build: ./auth
+#     ports:
+#       - "8001:8000"
+#     environment:
+#       - DATABASE_URL=postgresql://postgres:postgres@auth_db:5432/auth_db
+#       - SECRET_KEY=your-secret-key-here
+#     depends_on:
+#       - auth_db
+
 volumes:
   postgres_data:
+  auth_postgres_data:

@@ -4,7 +4,6 @@ from app.api.models import Product_sc, ProductUpdate_sc, Category_sc
 from app.db.dals import ProductDAL
 
 from sqlalchemy import select, delete, or_
-from sqlalchemy.orm import selectinload
 
 from app.db.models import Products, Categories
 

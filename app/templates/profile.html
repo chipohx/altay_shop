@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>Профиль пользователя</h2>
+    <div class="profile-info">
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+        <p><strong>Статус:</strong> {% if user.is_active %}Активен{% else %}Неактивен{% endif %}</p>
+        {% if user.is_superuser %}
+        <p><strong>Роль:</strong> Администратор</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+    margin-top: 1.5rem;
+}
+
+.profile-info p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.profile-info strong {
+    color: #333;
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %} 

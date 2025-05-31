@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Корзина</h1>
+    
+    {% if cart.items %}
+    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left font-semibold py-4">Товар</th>
+                    <th class="text-left font-semibold py-4">Цена</th>
+                    <th class="text-left font-semibold py-4">Количество</th>
+                    <th class="text-left font-semibold py-4">Итого</th>
+                    <th class="text-left font-semibold py-4">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-4">
+                        <div class="flex items-center">
+                            {% if item.product.main_photo %}
+                            <img src="{{ item.product.main_photo }}" alt="{{ item.product.title }}" 
+                                class="w-20 h-20 object-cover rounded-lg shadow-sm">
+                            {% endif %}
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-800">{{ item.product.title }}</h3>
+                                <p class="text-gray-600 text-sm mt-1">{{ item.product.description[:100] }}...</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4">
+                        <span class="text-gray-800 font-medium">{{ "%.2f"|format(item.product.price) }} ₽</span>
+                    </td>
+                    <td class="py-4">
+                        <div class="flex items-center">
+                            <button onclick="updateQuantity({{ item.id }}, {{ item.quantity - 1 }})" 
+                                class="w-8 h-8 flex items-center justify-center border rounded-l hover:bg-gray-100">
+                                -
+                            </button>
+                            <span class="w-12 h-8 flex items-center justify-center border-t border-b text-center">
+                                {{ item.quantity }}
+                            </span>
+                            <button onclick="updateQuantity({{ item.id }}, {{ item.quantity + 1 }})" 
+                                class="w-8 h-8 flex items-center justify-center border rounded-r hover:bg-gray-100">
+                                +
+                            </button>
+                        </div>
+                    </td>
+                    <td class="py-4">
+                        <span class="text-gray-800 font-medium">{{ "%.2f"|format(item.product.price * item.quantity) }} ₽</span>
+                    </td>
+                    <td class="py-4">
+                        <button onclick="removeItem({{ item.id }})" 
+                            class="text-red-500 hover:text-red-700 font-medium">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="mt-8 flex justify-between items-center border-t pt-6">
+            <button onclick="clearCart()" 
+                class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                Очистить корзину
+            </button>
+            <div class="text-right">
+                <p class="text-xl font-semibold text-gray-800 mb-2">
+                    Итого: {{ "%.2f"|format(cart.items|sum(attribute='product.price') * cart.items|sum(attribute='quantity')) }} ₽
+                </p>
+                <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <p class="text-gray-600 text-lg mb-4">Ваша корзина пуста</p>
+        <a href="/" class="text-blue-500 hover:text-blue-700 font-medium">
+            Продолжить покупки
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    color: #4B5563;
+    font-weight: 600;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.quantity-selector button {
+    transition: all 0.2s;
+}
+
+.quantity-selector button:hover {
+    background-color: #F3F4F6;
+}
+
+.quantity-selector span {
+    background-color: white;
+}
+
+button {
+    transition: all 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+img {
+    transition: transform 0.2s;
+}
+
+img:hover {
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+async function updateQuantity(itemId, newQuantity) {
+    if (newQuantity < 1) return;
+    
+    try {
+        const response = await fetch(`/api/v1/cart/items/${itemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+    }
+}
+
+async function removeItem(itemId) {
+    if (!confirm('Вы уверены, что хотите удалить этот товар из корзины?')) return;
+    
+    try {
+        const response = await fetch(`/api/v1/cart/items/${itemId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error removing item:', error);
+    }
+}
+
+async function clearCart() {
+    if (!confirm('Вы уверены, что хотите очистить корзину?')) return;
+    
+    try {
+        const response = await fetch('/api/v1/cart', {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error clearing cart:', error);
+    }
+}
+</script>
+{% endblock %} 

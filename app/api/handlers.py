@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body, Query, HTTPException, Form, UploadFile, File, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
+from typing import List, Optional, Dict
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import os
@@ -27,6 +27,7 @@ from app.api.actions.cart import (
     _clear_cart
 )
 from app.db.models import Categories
+from app.api.auth import get_current_user
 
 # Шаблоны для всех роутеров
 templates = Jinja2Templates(directory="app/templates")
@@ -370,6 +371,22 @@ async def cart_page(request: Request, db: AsyncSession = Depends(get_db)):
     })
     response.set_cookie(key="session_id", value=session_id)
     return response
+
+@router.get("/profile")
+async def profile_page(
+    request: Request,
+    current_user: Dict = Depends(get_current_user)
+):
+    """
+    Защищенный маршрут профиля пользователя
+    """
+    return templates.TemplateResponse(
+        "profile.html",
+        {
+            "request": request,
+            "user": current_user
+        }
+    )
 
 
     
