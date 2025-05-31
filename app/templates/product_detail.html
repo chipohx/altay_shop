@@ -20,7 +20,15 @@
         <div class="product-detail-description">
             {{ product.description }}
         </div>
-        <a href="/" class="btn btn-secondary">Назад к товарам</a>
+        <div class="product-actions">
+            <div class="quantity-selector">
+                <button onclick="updateQuantity(-1)" class="quantity-btn">-</button>
+                <input type="number" id="quantity" value="1" min="1" readonly>
+                <button onclick="updateQuantity(1)" class="quantity-btn">+</button>
+            </div>
+            <button onclick="addToCart()" class="btn btn-primary">Добавить в корзину</button>
+            <a href="/" class="btn btn-secondary">Назад к товарам</a>
+        </div>
         
         <div class="additional-photos-container">
             <h3>Все фотографии</h3>
@@ -61,6 +69,39 @@
 <script>
     // These functions are initialized when product detail loads
     let sliderPosition = 0;
+    let quantity = 1;
+    
+    function updateQuantity(change) {
+        const newQuantity = quantity + change;
+        if (newQuantity >= 1) {
+            quantity = newQuantity;
+            document.getElementById('quantity').value = quantity;
+        }
+    }
+    
+    async function addToCart() {
+        try {
+            const response = await fetch('/api/v1/cart/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: {{ product.id }},
+                    quantity: quantity
+                })
+            });
+            
+            if (response.ok) {
+                alert('Товар добавлен в корзину!');
+            } else {
+                alert('Ошибка при добавлении товара в корзину');
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Ошибка при добавлении товара в корзину');
+        }
+    }
     
     function setMainImage(imageSrc) {
         document.getElementById('main-product-image').src = imageSrc;
@@ -109,4 +150,68 @@
         });
     });
 </script>
+
+<style>
+.product-actions {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    align-items: center;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quantity-btn {
+    padding: 0.5rem 1rem;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+}
+
+.quantity-btn:hover {
+    background: #e5e5e5;
+}
+
+#quantity {
+    width: 50px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+</style>
 {% endblock %} 

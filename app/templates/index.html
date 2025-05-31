@@ -26,6 +26,195 @@
 
 {% block extra_js %}
 <script>
-    // Any page-specific JavaScript can go here
+// Функция для создания карточки товара
+function createProductCard(product) {
+    return `
+        <div class="product-card">
+            <a href="/product/${product.id}" class="product-link">
+                <div class="product-image">
+                    <img src="${product.main_photo || '/static/image/placeholder.jpg'}" alt="${product.title}">
+                </div>
+                <div class="product-info">
+                    <h3>${product.title}</h3>
+                    <p class="price">${product.price} ₽</p>
+                </div>
+            </a>
+            <div class="product-actions">
+                <div class="quantity-selector">
+                    <button onclick="updateQuantity(${product.id}, -1)" class="quantity-btn">-</button>
+                    <input type="number" id="quantity-${product.id}" value="1" min="1" readonly>
+                    <button onclick="updateQuantity(${product.id}, 1)" class="quantity-btn">+</button>
+                </div>
+                <button onclick="addToCart(${product.id})" class="btn btn-primary">Добавить в корзину</button>
+            </div>
+        </div>
+    `;
+}
+
+// Функция для обновления количества товара
+function updateQuantity(productId, change) {
+    const input = document.getElementById(`quantity-${productId}`);
+    const newQuantity = parseInt(input.value) + change;
+    if (newQuantity >= 1) {
+        input.value = newQuantity;
+    }
+}
+
+// Функция для добавления товара в корзину
+async function addToCart(productId) {
+    const quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+    
+    try {
+        const response = await fetch('/api/v1/cart/items', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        });
+        
+        if (response.ok) {
+            alert('Товар добавлен в корзину!');
+            // Сбрасываем количество обратно на 1
+            document.getElementById(`quantity-${productId}`).value = 1;
+        } else {
+            alert('Ошибка при добавлении товара в корзину');
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Ошибка при добавлении товара в корзину');
+    }
+}
+
+// Загрузка товаров при загрузке страницы
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/api/v1/products');
+        const products = await response.json();
+        
+        // Отображаем товары в сетке
+        const productGrid = document.getElementById('product-grid');
+        productGrid.innerHTML = products.map(product => createProductCard(product)).join('');
+        
+        // Отображаем лучшие товары (первые 4)
+        const featuredProducts = document.getElementById('featured-products');
+        featuredProducts.innerHTML = products.slice(0, 4).map(product => createProductCard(product)).join('');
+    } catch (error) {
+        console.error('Error loading products:', error);
+    }
+});
 </script>
+
+<style>
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-info {
+    margin-top: 1rem;
+}
+
+.product-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.price {
+    font-weight: bold;
+    color: #007bff;
+    margin: 0.5rem 0;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quantity-btn {
+    padding: 0.25rem 0.5rem;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+}
+
+.quantity-btn:hover {
+    background: #e5e5e5;
+}
+
+input[type="number"] {
+    width: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0.25rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.featured-products, .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+</style>
 {% endblock %} 

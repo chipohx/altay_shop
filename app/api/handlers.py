@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, Body, Query, HTTPException, Form, Upload
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import os
+import uuid
 
 from app.db.session import get_db
-from app.api.models import Product_sc, ProductUpdate_sc, Category_sc
+from app.api.models import Product_sc, ProductUpdate_sc, Category_sc, Cart_sc, CartItem_sc
 from app.api.actions.products import (
     _create_new_product,
     _create_new_category,
@@ -17,6 +18,13 @@ from app.api.actions.products import (
     _get_all_products,
     _get_search_products,
     _update_product
+)
+from app.api.actions.cart import (
+    _get_cart,
+    _add_to_cart,
+    _update_cart_item,
+    _remove_from_cart,
+    _clear_cart
 )
 from app.db.models import Categories
 
@@ -283,6 +291,85 @@ async def admin_delete_category(request: Request, category_id: int, db: AsyncSes
             "categories": categories,
             "error": f"Ошибка при удалении категории: {e.detail}"
         })
+
+# Cart endpoints
+@product_router.get("/cart", response_model=Cart_sc)
+async def get_cart(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    cart = await _get_cart(session_id, db)
+    response = JSONResponse(content=cart.model_dump())
+    response.set_cookie(key="session_id", value=session_id)
+    return response
+
+@product_router.post("/cart/items", response_model=Cart_sc)
+async def add_to_cart(
+    request: Request,
+    product_id: int = Body(...),
+    quantity: int = Body(1),
+    db: AsyncSession = Depends(get_db)
+):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    try:
+        cart = await _add_to_cart(session_id, product_id, quantity, db)
+        response = JSONResponse(content=cart.model_dump())
+        response.set_cookie(key="session_id", value=session_id)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@product_router.patch("/cart/items/{item_id}", response_model=Cart_sc)
+async def update_cart_item(
+    request: Request,
+    item_id: int,
+    quantity: int = Body(...),
+    db: AsyncSession = Depends(get_db)
+):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    try:
+        cart = await _update_cart_item(session_id, item_id, quantity, db)
+        response = JSONResponse(content=cart.model_dump())
+        response.set_cookie(key="session_id", value=session_id)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@product_router.delete("/cart/items/{item_id}", response_model=Cart_sc)
+async def remove_from_cart(
+    request: Request,
+    item_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    cart = await _remove_from_cart(session_id, item_id, db)
+    response = JSONResponse(content=cart.model_dump())
+    response.set_cookie(key="session_id", value=session_id)
+    return response
+
+@product_router.delete("/cart", response_model=Cart_sc)
+async def clear_cart(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    cart = await _clear_cart(session_id, db)
+    response = JSONResponse(content=cart.model_dump())
+    response.set_cookie(key="session_id", value=session_id)
+    return response
+
+# Frontend cart routes
+@frontend_router.get("/cart")
+async def cart_page(request: Request, db: AsyncSession = Depends(get_db)):
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    cart = await _get_cart(session_id, db)
+    response = templates.TemplateResponse("cart.html", {
+        "request": request,
+        "cart": cart
+    })
+    response.set_cookie(key="session_id", value=session_id)
+    return response
 
 
     

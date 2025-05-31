@@ -17,6 +17,8 @@ class Products(Base):
 
     # связь с категориями
     category = relationship("Categories", back_populates="products")
+    # связь с корзиной
+    cart_items = relationship("CartItem", back_populates="product")
 
 
 class Categories(Base):
@@ -27,6 +29,30 @@ class Categories(Base):
 
     # связь с товарами(Products)
     products = relationship("Products", back_populates="category")
+
+
+class Cart(Base):
+    __tablename__ = "carts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, nullable=False, unique=True)
+    created_at = Column(String, nullable=False)  # ISO format timestamp
+
+    # связь с товарами в корзине
+    items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cart_id = Column(Integer, ForeignKey("carts.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+
+    # связи
+    cart = relationship("Cart", back_populates="items")
+    product = relationship("Products", back_populates="cart_items")
 
 # Эта таблица будет удалена
 # class ProductPhoto(Base):
