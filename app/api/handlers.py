@@ -372,7 +372,7 @@ async def cart_page(request: Request, db: AsyncSession = Depends(get_db)):
     response.set_cookie(key="session_id", value=session_id)
     return response
 
-@router.get("/profile")
+@frontend_router.get("/profile")
 async def profile_page(
     request: Request,
     current_user: Dict = Depends(get_current_user)
